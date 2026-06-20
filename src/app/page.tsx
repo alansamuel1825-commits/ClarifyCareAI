@@ -22,10 +22,7 @@ import {
   Brain,
   Globe,
   Zap,
-  BookOpen,
-  LineChart,
   Target,
-  Heart,
   Trophy,
   Flame,
   LayoutDashboard,
@@ -53,7 +50,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem('aethia_records');
+    const saved = localStorage.getItem('aurora_records');
     if (saved) {
       try {
         setRecords(JSON.parse(saved));
@@ -62,14 +59,14 @@ export default function Home() {
       }
     }
     
-    const savedAccess = localStorage.getItem('aethia_access');
+    const savedAccess = localStorage.getItem('aurora_access');
     if (savedAccess) {
       try {
         setAccessibility(JSON.parse(savedAccess));
       } catch (e) {}
     }
 
-    const savedProgress = localStorage.getItem('aethia_progress');
+    const savedProgress = localStorage.getItem('aurora_progress');
     if (savedProgress) {
       try {
         setProgress(JSON.parse(savedProgress));
@@ -78,12 +75,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('aethia_records', JSON.stringify(records));
+    localStorage.setItem('aurora_records', JSON.stringify(records));
   }, [records]);
 
   useEffect(() => {
-    localStorage.setItem('aethia_access', JSON.stringify(accessibility));
-    localStorage.setItem('aethia_progress', JSON.stringify(progress));
+    localStorage.setItem('aurora_access', JSON.stringify(accessibility));
+    localStorage.setItem('aurora_progress', JSON.stringify(progress));
     if (accessibility.darkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -133,7 +130,7 @@ export default function Home() {
           <AlertTriangle className="h-8 w-8" />
         </Button>
         <div className="bg-destructive text-white text-[10px] font-black px-3 py-1 rounded-full shadow-xl pointer-events-auto uppercase tracking-tighter">
-          Immediate Emergency SOS
+          Emergency SOS
         </div>
       </div>
 
@@ -152,7 +149,7 @@ export default function Home() {
                 <Badge variant="outline" className="text-[8px] font-black py-0 px-2 h-4 border-primary/20 text-primary">PHASE 1 ACTIVE</Badge>
                 <div className="flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">Swarm Online</span>
+                  <span className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">Navigator Online</span>
                 </div>
               </div>
             </div>
@@ -192,7 +189,7 @@ export default function Home() {
               onClick={() => setCurrentRecord(null)}
             >
               <ChevronLeft className="h-5 w-5 mr-1 group-hover:-translate-x-1 transition-transform" />
-              Return to Intelligence Hub
+              Intelligence Hub
             </Button>
             
             <AnalysisResults 
@@ -210,25 +207,25 @@ export default function Home() {
                   <Brain className="h-12 w-12 text-primary" />
                 </div>
                 <div className="space-y-3">
-                  <h2 className="text-4xl font-headline font-black text-primary">Welcome, Potential.</h2>
+                  <h2 className="text-4xl font-headline font-black text-primary">Welcome to Aurora.</h2>
                   <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
-                    I am Saathi, your Aethia navigator. My multi-agent swarm is ready to help you simplify documents, navigate crises, and unlock your path to resolution.
+                    I am Saathi, your Human Potential Navigator. Our planetary intelligence hub is ready to help you simplify documents, navigate crises, and unlock your path to flourishing.
                   </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-4xl mx-auto">
                   <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-border shadow-sm">
                     <LayoutDashboard className="h-6 w-6 text-primary mb-4" />
                     <h4 className="font-black text-sm uppercase mb-2">Decision Core</h4>
-                    <p className="text-xs text-muted-foreground">Deterministic safety logic combined with deep AI reasoning.</p>
+                    <p className="text-xs text-muted-foreground">Safety logic combined with deep AI reasoning agents.</p>
                   </div>
                   <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-border shadow-sm">
                     <Users className="h-6 w-6 text-secondary mb-4" />
                     <h4 className="font-black text-sm uppercase mb-2">Agent Swarm</h4>
-                    <p className="text-xs text-muted-foreground">Specialized entities collaborating for your specific goal.</p>
+                    <p className="text-xs text-muted-foreground">Specialized entities collaborating for your specific life goals.</p>
                   </div>
                   <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-border shadow-sm">
                     <Dna className="h-6 w-6 text-green-500 mb-4" />
-                    <h4 className="font-black text-sm uppercase mb-2">Longevity Flow</h4>
+                    <h4 className="font-black text-sm uppercase mb-2">Potential Engine</h4>
                     <p className="text-xs text-muted-foreground">Tracking your journey over years to ensure meaningful outcomes.</p>
                   </div>
                 </div>
@@ -239,14 +236,14 @@ export default function Home() {
             <section className="text-center space-y-6 max-w-4xl mx-auto py-12">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest border border-primary/20 shadow-sm">
                 <Activity className="h-3 w-3" />
-                Planetary Intelligence Protocol
+                Saathi Protocol Active
               </div>
               <h1 className="text-5xl md:text-7xl font-headline font-black text-primary tracking-tight leading-[0.9]">
                 Move from Uncertainty <br/>
                 <span className="text-secondary italic">to Meaningful Action.</span>
               </h1>
               <p className="text-xl text-muted-foreground font-body leading-relaxed max-w-3xl mx-auto font-medium">
-                Aurora is your lifelong Human Potential Navigator. Our multi-agent system helps you understand complex documents, navigate crises, and unlock growth.
+                Aurora is your lifelong Human Potential Navigator. Our multi-agent system helps you understand complex situations, navigate crises, and unlock growth at scale.
               </p>
             </section>
 
@@ -269,7 +266,7 @@ export default function Home() {
                 
                 <Card className="p-6 border-primary/10 bg-primary/5 shadow-xl">
                   <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-6 flex items-center gap-2">
-                    <Target className="h-4 w-4" /> Resilience Metrics
+                    <Target className="h-4 w-4" /> Resilience Hub
                   </h3>
                   <div className="space-y-6">
                     <div className="flex justify-between items-center">
@@ -280,7 +277,7 @@ export default function Home() {
                        <div className="h-full bg-primary" style={{ width: `${progress.resilienceScore}%` }} />
                     </div>
                     <p className="text-[10px] text-muted-foreground italic leading-relaxed">
-                      "Success is measured by knowledge gained and problems solved."
+                      "Knowledge is the precursor to action. Action is the path to flourishing."
                     </p>
                   </div>
                 </Card>
@@ -288,10 +285,10 @@ export default function Home() {
                 <Card className="p-6 border-secondary/10 bg-secondary/5">
                   <div className="flex items-center gap-3 mb-4">
                     <Brain className="h-5 w-5 text-secondary" />
-                    <h3 className="text-sm font-black uppercase tracking-widest text-secondary">Neural Shield</h3>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-secondary">Safety Shield</h3>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Saathi Protocol is active. High-risk signals are prioritized with 99% accuracy for zero-latency escalation to human support networks.
+                    Aurora Safety Protocol is active. High-risk signals are prioritized with 99% accuracy for zero-latency escalation to human support networks.
                   </p>
                 </Card>
               </div>
@@ -303,13 +300,13 @@ export default function Home() {
       <footer className="container mx-auto px-4 mt-24 border-t py-12 text-center text-sm text-muted-foreground">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col items-start gap-1">
-            <p className="font-black text-primary tracking-tight">PROJECT AURORA</p>
-            <p>© 2025 Aethia Systems. Empowering Global Flourishing.</p>
+            <p className="font-black text-primary tracking-tight uppercase">Aethia Systems</p>
+            <p>© 2025 Project Aurora. Empowering Global Flourishing.</p>
           </div>
           <div className="flex items-center gap-8 font-bold text-[10px] uppercase tracking-widest">
-            <a href="#" className="hover:text-primary transition-colors">Ethics Protocol</a>
-            <a href="#" className="hover:text-primary transition-colors">Source Transparency</a>
-            <a href="#" className="hover:text-primary transition-colors">Crisis Support</a>
+            <a href="#" className="hover:text-primary transition-colors">Ethics Core</a>
+            <a href="#" className="hover:text-primary transition-colors">Source Data</a>
+            <a href="#" className="hover:text-primary transition-colors">Emergency Hub</a>
           </div>
         </div>
       </footer>
