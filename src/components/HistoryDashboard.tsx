@@ -9,9 +9,9 @@ import {
   History, 
   Trash2, 
   ExternalLink,
-  Search,
-  CheckCircle2,
-  Clock
+  Clock,
+  AlertTriangle,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -29,16 +29,16 @@ export function HistoryDashboard({ records, onSelect, onDelete }: HistoryDashboa
         <CardContent className="flex flex-col items-center justify-center p-12 text-center">
           <div className="relative w-48 h-32 mb-6 opacity-60 grayscale">
             <Image 
-              src="https://picsum.photos/seed/clarifycare-empty/400/300" 
+              src="https://picsum.photos/seed/saathi-empty/400/300" 
               alt="Empty history" 
               fill 
               className="object-contain"
               data-ai-hint="empty list"
             />
           </div>
-          <h3 className="text-xl font-headline font-semibold text-primary mb-2">No documents yet</h3>
+          <h3 className="text-xl font-headline font-semibold text-primary mb-2">Safe haven empty</h3>
           <p className="text-muted-foreground max-w-sm">
-            Your analysis history will appear here. Start by uploading or pasting a document above.
+            Your journey toward resolution starts here. Paste or speak your concerns above.
           </p>
         </CardContent>
       </Card>
@@ -50,7 +50,7 @@ export function HistoryDashboard({ records, onSelect, onDelete }: HistoryDashboa
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-headline font-semibold text-primary flex items-center gap-2">
           <History className="h-5 w-5" />
-          Previous Analyses
+          Journey History
         </h2>
         <Badge variant="outline">{records.length} Documents</Badge>
       </div>
@@ -62,17 +62,19 @@ export function HistoryDashboard({ records, onSelect, onDelete }: HistoryDashboa
             : 0;
 
           return (
-            <Card key={record.id} className="group hover:border-secondary transition-all cursor-pointer shadow-sm hover:shadow-md">
+            <Card key={record.id} className="group hover:border-primary transition-all cursor-pointer shadow-sm hover:shadow-md bg-card">
               <CardContent className="p-5" onClick={() => onSelect(record)}>
                 <div className="flex justify-between items-start mb-4">
                   <div className="space-y-1">
-                    <h4 className="font-headline font-bold text-foreground line-clamp-1">
-                      {record.analysis.keyPoints[0] || "Support Document"}
+                    <h4 className="font-headline font-bold text-foreground line-clamp-1 flex items-center gap-2">
+                      {record.crisisDetected && <AlertTriangle className="h-3 w-3 text-destructive" />}
+                      {record.analysis.keyPoints[0] || "Journey Analysis"}
                     </h4>
-                    <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
                       <Clock className="h-3 w-3" />
                       {new Date(record.timestamp).toLocaleDateString()}
-                    </p>
+                      <span className="flex items-center gap-1"><Globe className="h-2 w-2" /> {record.language}</span>
+                    </div>
                   </div>
                   <Button 
                     variant="ghost" 
@@ -88,29 +90,29 @@ export function HistoryDashboard({ records, onSelect, onDelete }: HistoryDashboa
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-xs text-muted-foreground line-clamp-3 italic">
+                  <p className="text-xs text-muted-foreground line-clamp-2 italic border-l-2 pl-2 border-primary/20">
                     "{record.analysis.plainLanguageSummary}"
                   </p>
 
                   <div className="space-y-2">
                     <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      <span>Progress</span>
+                      <span>Resolution Progress</span>
                       <span>{progress}%</span>
                     </div>
                     <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-secondary transition-all duration-500" 
+                        className="h-full bg-primary transition-all duration-500" 
                         style={{ width: `${progress}%` }}
                       />
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
-                    <Badge variant={record.actionPlan.urgency === 'High' ? 'destructive' : 'secondary'} className="text-[9px] px-1.5 h-4">
-                      {record.actionPlan.urgency} Urgency
+                    <Badge variant={record.crisisDetected ? 'destructive' : 'secondary'} className="text-[9px] px-1.5 h-4">
+                      {record.crisisDetected ? 'CRISIS' : record.actionPlan.urgency}
                     </Badge>
-                    <span className="text-[10px] font-medium text-secondary flex items-center gap-1 group-hover:underline">
-                      View Report <ExternalLink className="h-2 w-2" />
+                    <span className="text-[10px] font-bold text-primary flex items-center gap-1 group-hover:underline">
+                      Resume Support <ExternalLink className="h-2 w-2" />
                     </span>
                   </div>
                 </div>

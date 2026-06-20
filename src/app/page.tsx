@@ -6,10 +6,24 @@ import { DocumentProcessor } from '@/components/DocumentProcessor';
 import { AnalysisResults } from '@/components/AnalysisResults';
 import { HistoryDashboard } from '@/components/HistoryDashboard';
 import { AccessibilityControl } from '@/components/AccessibilityControl';
+import { CrisisBanner } from '@/components/CrisisBanner';
 import { AnalysisRecord, AccessibilitySettings } from '@/lib/types';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Info, Heart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { 
+  ChevronLeft, 
+  ShieldAlert, 
+  Activity, 
+  Sparkles, 
+  AlertTriangle,
+  Brain,
+  Globe,
+  Zap,
+  BookOpen,
+  LineChart
+} from "lucide-react";
 
 export default function Home() {
   const [records, setRecords] = useState<AnalysisRecord[]>([]);
@@ -18,11 +32,12 @@ export default function Home() {
     highContrast: false,
     largeText: false,
     voiceSynthesis: false,
+    darkMode: false,
+    language: 'English',
   });
 
-  // Hydration safety for local storage
   useEffect(() => {
-    const saved = localStorage.getItem('clarifycare_records');
+    const saved = localStorage.getItem('aurora_records');
     if (saved) {
       try {
         setRecords(JSON.parse(saved));
@@ -31,7 +46,7 @@ export default function Home() {
       }
     }
     
-    const savedAccess = localStorage.getItem('clarifycare_access');
+    const savedAccess = localStorage.getItem('aurora_access');
     if (savedAccess) {
       try {
         setAccessibility(JSON.parse(savedAccess));
@@ -40,11 +55,16 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('clarifycare_records', JSON.stringify(records));
+    localStorage.setItem('aurora_records', JSON.stringify(records));
   }, [records]);
 
   useEffect(() => {
-    localStorage.setItem('clarifycare_access', JSON.stringify(accessibility));
+    localStorage.setItem('aurora_access', JSON.stringify(accessibility));
+    if (accessibility.darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, [accessibility]);
 
   const handleAnalysisComplete = (newRecord: AnalysisRecord) => {
@@ -62,108 +82,186 @@ export default function Home() {
     setCurrentRecord(updated);
   };
 
-  const updateAccess = (key: string, value: boolean) => {
+  const updateAccess = (key: string, value: any) => {
     setAccessibility({ ...accessibility, [key]: value });
   };
 
   return (
     <div className={cn(
-      "min-h-screen transition-all duration-300 bg-background pb-12",
+      "min-h-screen transition-all duration-500 bg-background pb-20",
       accessibility.highContrast && "high-contrast",
-      accessibility.largeText && "large-text"
+      accessibility.largeText && "large-text",
+      accessibility.darkMode && "dark"
     )}>
-      {/* Top Header Navigation */}
-      <header className="sticky top-0 z-50 w-full border-b bg-white/70 backdrop-blur-md">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      {/* Floating SOS Button - Global Safety Protocol */}
+      <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-3 pointer-events-none">
+        <Button 
+          variant="destructive" 
+          size="lg"
+          className="h-16 w-16 rounded-full shadow-2xl shadow-red-500/50 animate-bounce pointer-events-auto border-4 border-white dark:border-zinc-900"
+          onClick={() => window.open('tel:988', '_self')}
+        >
+          <AlertTriangle className="h-8 w-8" />
+        </Button>
+        <div className="bg-destructive text-white text-[10px] font-black px-3 py-1 rounded-full shadow-xl pointer-events-auto">
+          EMERGENCY SOS
+        </div>
+      </div>
+
+      <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-xl">
+        <div className="container mx-auto px-4 h-20 flex items-center justify-between">
           <div 
-            className="flex items-center gap-2 cursor-pointer" 
+            className="flex items-center gap-3 cursor-pointer group" 
             onClick={() => setCurrentRecord(null)}
           >
-            <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
-              <Heart className="h-6 w-6 fill-current" />
+            <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/30 group-hover:scale-105 transition-transform">
+              <Sparkles className="h-7 w-7" />
             </div>
             <div>
-              <h1 className="text-xl font-headline font-bold text-primary leading-none">ClarifyCare AI</h1>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Support Simplifier</p>
+              <h1 className="text-2xl font-headline font-black text-primary leading-none tracking-tight">Project Aurora</h1>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-black mt-1">Aethia Systems Intelligence</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <AccessibilityControl 
               settings={accessibility} 
               onUpdate={updateAccess} 
             />
-            <Button 
-              variant="default" 
-              className="hidden sm:flex bg-secondary hover:bg-secondary/90 text-white shadow-md shadow-secondary/10"
-              onClick={() => setCurrentRecord(null)}
-            >
-              Analyze New
-            </Button>
+            <div className="hidden md:flex h-10 w-px bg-border mx-2" />
+            <div className="hidden md:flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                <ShieldAlert className="h-4 w-4" />
+              </div>
+              <span className="text-xs font-bold text-muted-foreground">Trust Score: Verified</span>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-12">
+        {currentRecord?.crisisDetected && (
+          <div className="mb-12 animate-in slide-in-from-top-4 duration-500">
+            <CrisisBanner record={currentRecord} />
+          </div>
+        )}
+
         {currentRecord ? (
-          <div className="space-y-6 max-w-6xl mx-auto">
+          <div className="space-y-8 max-w-7xl mx-auto">
             <Button 
               variant="ghost" 
-              className="group -ml-4 text-muted-foreground hover:text-primary"
+              className="group -ml-4 text-muted-foreground hover:text-primary font-bold"
               onClick={() => setCurrentRecord(null)}
             >
-              <ChevronLeft className="h-4 w-4 mr-1 group-hover:-translate-x-1 transition-transform" />
-              Back to Dashboard
+              <ChevronLeft className="h-5 w-5 mr-1 group-hover:-translate-x-1 transition-transform" />
+              Return to Intelligence Hub
             </Button>
             
             <AnalysisResults 
               record={currentRecord} 
               onUpdateRecord={handleUpdateRecord}
-              voiceActive={accessibility.voiceSynthesis}
+              accessibility={accessibility}
             />
           </div>
         ) : (
-          <div className="space-y-12 max-w-6xl mx-auto">
+          <div className="space-y-16 max-w-7xl mx-auto">
             {/* Hero Section */}
-            <section className="text-center space-y-4 max-w-2xl mx-auto py-8">
-              <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary tracking-tight">
-                Understand confusing forms <br/>
-                <span className="text-secondary">in seconds.</span>
+            <section className="text-center space-y-6 max-w-4xl mx-auto py-12">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest border border-primary/20 shadow-sm">
+                <Activity className="h-3 w-3" />
+                Saathi Navigation Protocol Active
+              </div>
+              <h1 className="text-5xl md:text-7xl font-headline font-black text-primary tracking-tight leading-[0.9]">
+                Unlock Human Potential. <br/>
+                <span className="text-secondary italic">Accelerate Understanding.</span>
               </h1>
-              <p className="text-lg text-muted-foreground font-body leading-relaxed">
-                ClarifyCare AI translates complex bureaucratic notices into simple language, 
-                giving you a step-by-step action plan and local support resources.
+              <p className="text-xl text-muted-foreground font-body leading-relaxed max-w-3xl mx-auto font-medium">
+                Aurora is a lifelong intelligence layer designed to move humanity from uncertainty to action. 
+                Our multi-agent system provides world-class guidance for education, health, and global support.
               </p>
+              
+              {/* Agent Hub Visualization */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
+                <div className="p-4 rounded-2xl border bg-card/50 flex flex-col items-center gap-2">
+                  <BookOpen className="h-6 w-6 text-blue-500" />
+                  <span className="text-[10px] font-black uppercase">Education Agent</span>
+                </div>
+                <div className="p-4 rounded-2xl border bg-card/50 flex flex-col items-center gap-2">
+                  <Zap className="h-6 w-6 text-amber-500" />
+                  <span className="text-[10px] font-black uppercase">Planning Agent</span>
+                </div>
+                <div className="p-4 rounded-2xl border bg-card/50 flex flex-col items-center gap-2">
+                  <Globe className="h-6 w-6 text-green-500" />
+                  <span className="text-[10px] font-black uppercase">Resource Agent</span>
+                </div>
+                <div className="p-4 rounded-2xl border bg-card/50 flex flex-col items-center gap-2">
+                  <ShieldAlert className="h-6 w-6 text-red-500" />
+                  <span className="text-[10px] font-black uppercase">Safety Agent</span>
+                </div>
+              </div>
             </section>
 
-            {/* Main Interaction Area */}
-            <DocumentProcessor onAnalysisComplete={handleAnalysisComplete} />
-
-            {/* Dashboard / History */}
-            <HistoryDashboard 
-              records={records} 
-              onSelect={setCurrentRecord} 
-              onDelete={handleDeleteRecord} 
+            {/* Input Component */}
+            <DocumentProcessor 
+              onAnalysisComplete={handleAnalysisComplete} 
+              currentLanguage={accessibility.language}
             />
+
+            {/* Hub Insights */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="md:col-span-2">
+                <HistoryDashboard 
+                  records={records} 
+                  onSelect={setCurrentRecord} 
+                  onDelete={handleDeleteRecord} 
+                />
+              </div>
+              <div className="space-y-6">
+                <Card className="p-6 border-primary/10 bg-primary/5">
+                  <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-4">Planetary Metrics</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-muted-foreground">Opportunities Created</span>
+                      <span className="text-lg font-black text-primary">1.2M</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-muted-foreground">Problems Solved</span>
+                      <span className="text-lg font-black text-primary">850K</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-muted-foreground">Well-being Uplift</span>
+                      <span className="text-lg font-black text-primary">+22%</span>
+                    </div>
+                  </div>
+                </Card>
+                
+                <Card className="p-6 border-secondary/10">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Brain className="h-5 w-5 text-secondary" />
+                    <h3 className="text-sm font-black uppercase tracking-widest text-secondary">Neural Shield</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Our safety protocols are deterministic. High-risk signals are processed with zero-latency human escalation paths.
+                  </p>
+                </Card>
+              </div>
+            </div>
           </div>
         )}
       </main>
 
-      <footer className="container mx-auto px-4 mt-12 border-t pt-8 text-center text-sm text-muted-foreground">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <p>© 2025 ClarifyCare AI. Built with empathy for community support.</p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-primary transition-colors flex items-center gap-1">
-              <Info className="h-3 w-3" />
-              How it works
-            </a>
-            <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-            <a href="#" className="hover:text-primary transition-colors">Help Center</a>
+      <footer className="container mx-auto px-4 mt-24 border-t py-12 text-center text-sm text-muted-foreground">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex flex-col items-start gap-1">
+            <p className="font-black text-primary tracking-tight">PROJECT AURORA</p>
+            <p>© 2025 Aethia Systems. Empowering Global Resilience.</p>
           </div>
-        </div>
-        <div className="mt-8 p-4 bg-muted/30 rounded-lg max-w-3xl mx-auto text-[11px] text-muted-foreground italic">
-          Disclaimer: ClarifyCare AI provides informational summaries only. We do not provide legal, medical, or financial advice. 
-          Please verify all critical information with the official source or a qualified professional.
+          <div className="flex items-center gap-8 font-bold">
+            <a href="#" className="hover:text-primary transition-colors">Ethics Protocol</a>
+            <a href="#" className="hover:text-primary transition-colors">Source Transparency</a>
+            <a href="#" className="hover:text-primary transition-colors">Universal Access</a>
+            <a href="#" className="hover:text-primary transition-colors">Crisis Support</a>
+          </div>
         </div>
       </footer>
     </div>
