@@ -23,7 +23,7 @@ export interface AnalysisRecord {
   crisisDetected: boolean;
   crisisTypes: string[];
   confidenceScore: number;
-  agentInsights?: AgentInsight[];
+  agentInsights: AgentInsight[];
   nextSteps?: string[];
   followUpCompleted?: boolean;
 }
@@ -42,4 +42,5 @@ export interface UserProgress {
   badges: string[];
   moodScore: number;
   resilienceScore: number;
+  onboardingComplete: boolean;
 }

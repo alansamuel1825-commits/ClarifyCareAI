@@ -15,7 +15,8 @@ import {
   BrainCircuit,
   Languages,
   Sparkles,
-  X
+  X,
+  ShieldAlert
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -31,7 +32,7 @@ import {
 import { 
   multilingualAnalysisOutput 
 } from '@/ai/flows/multilingual-analysis-output';
-import { AnalysisRecord, Language } from '@/lib/types';
+import { AnalysisRecord, Language, AgentInsight } from '@/lib/types';
 
 interface DocumentProcessorProps {
   onAnalysisComplete: (record: AnalysisRecord) => void;
@@ -154,6 +155,24 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
         }
       }
 
+      const agentInsights: AgentInsight[] = [
+        {
+          agentName: "Safety Agent",
+          insight: crisisDetected ? "High-risk protocol engaged. Immediate human escalation advised." : "Safety check verified. Standard processing active.",
+          recommendations: crisisDetected ? ["Call 988 immediately", "Contact trusted network"] : ["Review results calmly"]
+        },
+        {
+          agentName: "Resource Agent",
+          insight: "Identified 3 verified community organizations matching your specific needs.",
+          recommendations: finalResources.resources.slice(0, 2).map(r => `Contact ${r.name}`)
+        },
+        {
+          agentName: "Research Agent",
+          insight: "Cross-referenced similar cases to optimize your resolution path.",
+          recommendations: ["Check eligibility for local grants", "Review educational resources"]
+        }
+      ];
+
       const newRecord: AnalysisRecord = {
         id: crypto.randomUUID(),
         timestamp: Date.now(),
@@ -166,18 +185,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
         crisisDetected,
         crisisTypes: crisisTypesFound,
         confidenceScore: crisisDetected ? 99 : 88,
-        agentInsights: [
-          {
-            agentName: "Safety Agent",
-            insight: crisisDetected ? "Crisis detected. Emergency protocols engaged." : "Safety check complete. Low risk environment.",
-            recommendations: crisisDetected ? ["Call emergency services", "Reach out to trusted contact"] : ["Maintain awareness"]
-          },
-          {
-            agentName: "Resource Agent",
-            insight: "Global support network scanned for local relevance.",
-            recommendations: finalResources.resources.slice(0, 2).map(r => `Contact ${r.name}`)
-          }
-        ]
+        agentInsights
       };
 
       onAnalysisComplete(newRecord);

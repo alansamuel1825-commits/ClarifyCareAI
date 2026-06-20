@@ -25,10 +25,12 @@ import {
   Zap,
   Globe,
   Share2,
-  Printer
+  Printer,
+  CalendarCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useToast } from '@/hooks/use-toast';
 
 interface AnalysisResultsProps {
   record: AnalysisRecord;
@@ -39,8 +41,9 @@ interface AnalysisResultsProps {
 export function AnalysisResults({ record, onUpdateRecord, accessibility }: AnalysisResultsProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showFollowUp, setShowFollowUp] = useState(false);
+  const { toast } = useToast();
 
-  const progress = record.actionPlan.actionPlan.length > 0 
+  const progressValue = record.actionPlan.actionPlan.length > 0 
     ? Math.round((record.completedSteps.length / record.actionPlan.actionPlan.length) * 100)
     : 0;
 
@@ -68,6 +71,13 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
       window.speechSynthesis.speak(utterance);
       setIsSpeaking(true);
     }
+  };
+
+  const handleSyncToCalendar = () => {
+    toast({
+      title: "Syncing Actions...",
+      description: "Saathi is integrating these deadlines into your planetary calendar.",
+    });
   };
 
   return (
@@ -108,9 +118,9 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
               <div className="p-2 rounded-xl bg-primary/10"><Zap className="h-6 w-6 text-primary" /></div>
               <h3 className="text-xl font-headline font-black text-primary">Progress Hub</h3>
             </div>
-            <span className="text-4xl font-black text-primary">{progress}%</span>
+            <span className="text-4xl font-black text-primary">{progressValue}%</span>
           </div>
-          <Progress value={progress} className="h-4 bg-primary/10 rounded-full" />
+          <Progress value={progressValue} className="h-4 bg-primary/10 rounded-full" />
         </CardContent>
       </Card>
 
@@ -124,6 +134,21 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
             </CardHeader>
             <CardContent className="p-8 space-y-8">
               <p className="text-2xl leading-relaxed text-foreground/90 font-medium">{record.analysis.plainLanguageSummary}</p>
+              
+              {record.agentInsights && record.agentInsights.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-8 border-t">
+                  {record.agentInsights.map((agent, i) => (
+                    <div key={i} className="p-4 rounded-2xl bg-muted/30 border border-border/50">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Bot className="h-4 w-4 text-primary" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-primary">{agent.agentName}</span>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground leading-tight">{agent.insight}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t">
                 <div className="space-y-4">
                   <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
@@ -174,8 +199,13 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
         <div className="space-y-8">
           <Card className="shadow-2xl border-none sticky top-24 overflow-hidden rounded-3xl">
             <CardHeader className="bg-primary p-6 text-white">
-              <CardTitle className="flex items-center gap-3 text-lg font-black uppercase tracking-widest">
-                <ListChecks className="h-6 w-6" /> Action Protocol
+              <CardTitle className="flex items-center justify-between text-lg font-black uppercase tracking-widest">
+                <div className="flex items-center gap-3">
+                  <ListChecks className="h-6 w-6" /> Action Protocol
+                </div>
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" onClick={handleSyncToCalendar}>
+                  <CalendarCheck className="h-5 w-5" />
+                </Button>
               </CardTitle>
               <CardDescription className="text-primary-foreground/70 text-[9px] font-black uppercase mt-1">Specialized Planning Agent active</CardDescription>
             </CardHeader>

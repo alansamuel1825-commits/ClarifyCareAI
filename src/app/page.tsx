@@ -27,7 +27,10 @@ import {
   Target,
   Heart,
   Trophy,
-  Flame
+  Flame,
+  LayoutDashboard,
+  Users,
+  Dna
 } from "lucide-react";
 
 export default function Home() {
@@ -39,6 +42,7 @@ export default function Home() {
     badges: ['Early Adopter', 'Resilience Starter'],
     moodScore: 72,
     resilienceScore: 65,
+    onboardingComplete: false
   });
   const [accessibility, setAccessibility] = useState<AccessibilitySettings>({
     highContrast: false,
@@ -64,6 +68,13 @@ export default function Home() {
         setAccessibility(JSON.parse(savedAccess));
       } catch (e) {}
     }
+
+    const savedProgress = localStorage.getItem('aethia_progress');
+    if (savedProgress) {
+      try {
+        setProgress(JSON.parse(savedProgress));
+      } catch (e) {}
+    }
   }, []);
 
   useEffect(() => {
@@ -72,20 +83,21 @@ export default function Home() {
 
   useEffect(() => {
     localStorage.setItem('aethia_access', JSON.stringify(accessibility));
+    localStorage.setItem('aethia_progress', JSON.stringify(progress));
     if (accessibility.darkMode) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [accessibility]);
+  }, [accessibility, progress]);
 
   const handleAnalysisComplete = (newRecord: AnalysisRecord) => {
     setRecords([newRecord, ...records]);
     setCurrentRecord(newRecord);
-    // Update streak/resilience
     setProgress(prev => ({
       ...prev,
       resilienceScore: Math.min(100, prev.resilienceScore + 2),
+      onboardingComplete: true
     }));
   };
 
@@ -136,7 +148,13 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-2xl font-headline font-black text-primary leading-none tracking-tight">Project Aurora</h1>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-black mt-1">Aethia Systems Intelligence</p>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="outline" className="text-[8px] font-black py-0 px-2 h-4 border-primary/20 text-primary">PHASE 1 ACTIVE</Badge>
+                <div className="flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                  <span className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">Swarm Online</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -185,6 +203,38 @@ export default function Home() {
           </div>
         ) : (
           <div className="space-y-16 max-w-7xl mx-auto">
+            {/* Onboarding State */}
+            {!progress.onboardingComplete && records.length === 0 && (
+              <Card className="p-12 border-dashed border-2 border-primary/20 bg-primary/5 rounded-[3rem] text-center space-y-8">
+                <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <Brain className="h-12 w-12 text-primary" />
+                </div>
+                <div className="space-y-3">
+                  <h2 className="text-4xl font-headline font-black text-primary">Welcome, Potential.</h2>
+                  <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
+                    I am Saathi, your Aethia navigator. My multi-agent swarm is ready to help you simplify documents, navigate crises, and unlock your path to resolution.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-4xl mx-auto">
+                  <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-border shadow-sm">
+                    <LayoutDashboard className="h-6 w-6 text-primary mb-4" />
+                    <h4 className="font-black text-sm uppercase mb-2">Decision Core</h4>
+                    <p className="text-xs text-muted-foreground">Deterministic safety logic combined with deep AI reasoning.</p>
+                  </div>
+                  <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-border shadow-sm">
+                    <Users className="h-6 w-6 text-secondary mb-4" />
+                    <h4 className="font-black text-sm uppercase mb-2">Agent Swarm</h4>
+                    <p className="text-xs text-muted-foreground">Specialized entities collaborating for your specific goal.</p>
+                  </div>
+                  <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-border shadow-sm">
+                    <Dna className="h-6 w-6 text-green-500 mb-4" />
+                    <h4 className="font-black text-sm uppercase mb-2">Longevity Flow</h4>
+                    <p className="text-xs text-muted-foreground">Tracking your journey over years to ensure meaningful outcomes.</p>
+                  </div>
+                </div>
+              </Card>
+            )}
+
             {/* Hero Section */}
             <section className="text-center space-y-6 max-w-4xl mx-auto py-12">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest border border-primary/20 shadow-sm">
@@ -229,6 +279,9 @@ export default function Home() {
                     <div className="h-2 w-full bg-primary/10 rounded-full overflow-hidden">
                        <div className="h-full bg-primary" style={{ width: `${progress.resilienceScore}%` }} />
                     </div>
+                    <p className="text-[10px] text-muted-foreground italic leading-relaxed">
+                      "Success is measured by knowledge gained and problems solved."
+                    </p>
                   </div>
                 </Card>
 
