@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -10,12 +11,10 @@ import {
   Upload, 
   Mic, 
   MicOff,
-  Search,
   Loader2,
   BrainCircuit,
   Languages,
   Sparkles,
-  Camera,
   X
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -120,13 +119,12 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
       const crisisTypesFound = CRISIS_KEYWORDS.filter(k => combinedText.toLowerCase().includes(k));
       const crisisDetected = crisisTypesFound.length > 0;
 
-      // Primary AI Analysis Calls
       const [analysisOutput, actionPlanOutput] = await Promise.all([
         documentAnalysisAndSimplification({ 
           documentText: text || undefined, 
           documentDataUri: uploadedFile || undefined 
         }),
-        actionPlanAndUrgencyAssessment({ documentText: text || fileName || "Document Analysis" })
+        actionPlanAndUrgencyAssessment({ documentText: text || fileName || "Analysis" })
       ]);
       
       const resourcesOutput = await recommendResources({
@@ -139,7 +137,6 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
       let finalActionPlan = actionPlanOutput;
       let finalResources = resourcesOutput;
 
-      // Handle Translation if needed
       if (currentLanguage !== 'English') {
         const translateData = async (data: any) => {
           const res = await multilingualAnalysisOutput({
@@ -148,7 +145,6 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
           });
           return JSON.parse(res.translatedText);
         };
-
         try {
            finalAnalysis = await translateData(analysisOutput);
            finalActionPlan = await translateData(actionPlanOutput);
@@ -173,26 +169,15 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
         agentInsights: [
           {
             agentName: "Safety Agent",
-            insight: crisisDetected ? "High-risk indicators identified. Emergency protocols activated." : "Environment scan complete. No immediate safety threats detected.",
-            recommendations: crisisDetected ? ["Call emergency services", "Reach out to trusted contact"] : ["Maintain current progress"]
+            insight: crisisDetected ? "Crisis detected. Emergency protocols engaged." : "Safety check complete. Low risk environment.",
+            recommendations: crisisDetected ? ["Call emergency services", "Reach out to trusted contact"] : ["Maintain awareness"]
           },
           {
             agentName: "Resource Agent",
-            insight: "Tailoring support network based on detected needs.",
+            insight: "Global support network scanned for local relevance.",
             recommendations: finalResources.resources.slice(0, 2).map(r => `Contact ${r.name}`)
-          },
-          {
-            agentName: "Education Agent",
-            insight: "Identifying learning pathways from content.",
-            recommendations: ["Review related concepts", "Schedule learning time"]
-          },
-          {
-            agentName: "Research Agent",
-            insight: "Scanning global databases for similar case outcomes.",
-            recommendations: ["Examine historical precedents", "Verify with official sources"]
           }
-        ],
-        nextSteps: finalActionPlan.actionPlan.slice(0, 3)
+        ]
       };
 
       onAnalysisComplete(newRecord);
@@ -221,7 +206,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-headline font-black text-primary flex items-center gap-3">
                 <Sparkles className="h-6 w-6 text-secondary" />
-                Saathi Input Hub
+                Saathi Intelligence Input
               </h2>
               <Badge variant="outline" className="flex items-center gap-2 border-primary/20 bg-primary/5 px-4 py-1">
                 <Languages className="h-3 w-3" />
@@ -231,9 +216,9 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
             
             <div className="relative group">
               <Textarea 
-                placeholder="Describe your situation, paste a document, or tell Aurora what's on your mind... We are here to navigate with you."
+                placeholder="Paste text, upload a document, or use Voice Mode to describe your situation. Aurora is listening..."
                 className={cn(
-                  "min-h-[250px] text-lg font-body resize-none focus-visible:ring-secondary border-muted p-8 leading-relaxed shadow-inner",
+                  "min-h-[200px] text-lg font-body resize-none focus-visible:ring-secondary border-muted p-8 leading-relaxed shadow-inner",
                   isRecording && "ring-4 ring-destructive/30 animate-pulse"
                 )}
                 value={inputText}
@@ -243,7 +228,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
               {isRecording && (
                 <div className="absolute top-6 right-6 flex items-center gap-3 text-destructive font-black text-xs tracking-widest">
                   <span className="h-3 w-3 rounded-full bg-destructive animate-ping" />
-                  SAATHI IS LISTENING
+                  LISTENING...
                 </div>
               )}
 
@@ -259,58 +244,33 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
-                accept="application/pdf,image/*" 
-                onChange={handleFileUpload}
-              />
-              
-              <Button variant="outline" className="gap-2 font-bold px-6 border-primary/20 hover:bg-primary/5" onClick={() => fileInputRef.current?.click()}>
+              <input type="file" ref={fileInputRef} className="hidden" accept="application/pdf,image/*" onChange={handleFileUpload} />
+              <Button variant="outline" className="gap-2 font-bold border-primary/20 hover:bg-primary/5" onClick={() => fileInputRef.current?.click()}>
                 <Upload className="h-4 w-4" />
-                Document/Image
+                Upload File
               </Button>
-
               <Button 
                 variant={isRecording ? "destructive" : "outline"} 
-                className={cn("gap-2 font-bold px-6", isRecording && "shadow-lg shadow-destructive/20")}
+                className={cn("gap-2 font-bold", isRecording && "shadow-lg shadow-destructive/20")}
                 onClick={toggleRecording}
                 disabled={isAnalyzing}
               >
                 {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 Voice Mode
               </Button>
-
               <div className="flex-1" />
-
               <Button 
-                className="bg-primary hover:bg-primary/90 text-white min-w-[220px] h-14 gap-3 font-black text-lg shadow-2xl shadow-primary/40 rounded-2xl group"
+                className="bg-primary hover:bg-primary/90 text-white min-w-[200px] h-12 gap-3 font-black text-lg shadow-2xl shadow-primary/40 rounded-xl"
                 onClick={() => handleAnalysis(inputText)}
                 disabled={isAnalyzing}
               >
-                {isAnalyzing ? <Loader2 className="h-5 w-5 animate-spin" /> : <BrainCircuit className="h-5 w-5 group-hover:rotate-12 transition-transform" />}
-                {isAnalyzing ? "REASONING..." : "START JOURNEY"}
+                {isAnalyzing ? <Loader2 className="h-5 w-5 animate-spin" /> : <BrainCircuit className="h-5 w-5" />}
+                {isAnalyzing ? "REASONING..." : "ANALYZE"}
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {[
-          { label: "Neural Layer", value: "Real-time AI", desc: "Aethia Intelligence" },
-          { label: "Swarm Hub", value: "Active Coordination", desc: "Multi-Agent Protocol" },
-          { label: "Trust Shield", value: "Verified Insights", desc: "Source Attribution" },
-          { label: "Universal Access", value: "Multilingual", desc: "Cross-Cultural Support" }
-        ].map((item, i) => (
-          <div key={i} className="p-6 rounded-2xl bg-card border border-border shadow-sm hover:shadow-md transition-all group">
-            <h3 className="text-[10px] font-black uppercase text-primary mb-1 tracking-widest">{item.label}</h3>
-            <p className="text-xs font-bold text-foreground mb-1">{item.value}</p>
-            <p className="text-[10px] text-muted-foreground">{item.desc}</p>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

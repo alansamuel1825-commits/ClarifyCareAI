@@ -35,3 +35,11 @@ export type AccessibilitySettings = {
   darkMode: boolean;
   language: Language;
 };
+
+export interface UserProgress {
+  streak: number;
+  lastActive: number;
+  badges: string[];
+  moodScore: number;
+  resilienceScore: number;
+}

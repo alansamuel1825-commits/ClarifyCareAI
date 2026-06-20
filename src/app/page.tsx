@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -6,7 +7,8 @@ import { AnalysisResults } from '@/components/AnalysisResults';
 import { HistoryDashboard } from '@/components/HistoryDashboard';
 import { AccessibilityControl } from '@/components/AccessibilityControl';
 import { CrisisBanner } from '@/components/CrisisBanner';
-import { AnalysisRecord, AccessibilitySettings } from '@/lib/types';
+import { SelfCareHub } from '@/components/SelfCareHub';
+import { AnalysisRecord, AccessibilitySettings, UserProgress } from '@/lib/types';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,12 +25,21 @@ import {
   BookOpen,
   LineChart,
   Target,
-  Heart
+  Heart,
+  Trophy,
+  Flame
 } from "lucide-react";
 
 export default function Home() {
   const [records, setRecords] = useState<AnalysisRecord[]>([]);
   const [currentRecord, setCurrentRecord] = useState<AnalysisRecord | null>(null);
+  const [progress, setProgress] = useState<UserProgress>({
+    streak: 3,
+    lastActive: Date.now(),
+    badges: ['Early Adopter', 'Resilience Starter'],
+    moodScore: 72,
+    resilienceScore: 65,
+  });
   const [accessibility, setAccessibility] = useState<AccessibilitySettings>({
     highContrast: false,
     largeText: false,
@@ -71,6 +82,11 @@ export default function Home() {
   const handleAnalysisComplete = (newRecord: AnalysisRecord) => {
     setRecords([newRecord, ...records]);
     setCurrentRecord(newRecord);
+    // Update streak/resilience
+    setProgress(prev => ({
+      ...prev,
+      resilienceScore: Math.min(100, prev.resilienceScore + 2),
+    }));
   };
 
   const handleDeleteRecord = (id: string) => {
@@ -125,17 +141,20 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-4">
+             <div className="hidden lg:flex items-center gap-6 mr-6">
+                <div className="flex items-center gap-2">
+                   <Flame className="h-4 w-4 text-orange-500" />
+                   <span className="text-sm font-black">{progress.streak} Day Streak</span>
+                </div>
+                <div className="flex items-center gap-2">
+                   <Trophy className="h-4 w-4 text-yellow-500" />
+                   <span className="text-sm font-black">{progress.badges.length} Badges</span>
+                </div>
+             </div>
             <AccessibilityControl 
               settings={accessibility} 
               onUpdate={updateAccess} 
             />
-            <div className="hidden md:flex h-10 w-px bg-border mx-2" />
-            <div className="hidden md:flex items-center gap-2">
-              <Badge variant="outline" className="border-secondary text-secondary font-black text-[10px]">
-                SAATHI ACTIVE
-              </Badge>
-              <span className="text-xs font-bold text-muted-foreground">Neural Trust: Verified</span>
-            </div>
           </div>
         </div>
       </header>
@@ -166,90 +185,60 @@ export default function Home() {
           </div>
         ) : (
           <div className="space-y-16 max-w-7xl mx-auto">
-            {/* Hero Section - The "Everything" Navigator */}
+            {/* Hero Section */}
             <section className="text-center space-y-6 max-w-4xl mx-auto py-12">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest border border-primary/20 shadow-sm">
                 <Activity className="h-3 w-3" />
-                Planetary Immune Protocol
+                Planetary Intelligence Protocol
               </div>
               <h1 className="text-5xl md:text-7xl font-headline font-black text-primary tracking-tight leading-[0.9]">
-                Unlock Human Potential. <br/>
-                <span className="text-secondary italic">Accelerate Understanding.</span>
+                Move from Uncertainty <br/>
+                <span className="text-secondary italic">to Meaningful Action.</span>
               </h1>
               <p className="text-xl text-muted-foreground font-body leading-relaxed max-w-3xl mx-auto font-medium">
-                Aurora is a lifelong intelligence layer designed to move humanity from uncertainty to action. 
-                Our multi-agent system provides world-class guidance for education, health, and global support.
+                Aurora is your lifelong Human Potential Navigator. Our multi-agent system helps you understand complex documents, navigate crises, and unlock growth.
               </p>
-              
-              {/* Agent Hub Visualization */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
-                {[
-                  { icon: BookOpen, label: "Education Agent", color: "text-blue-500" },
-                  { icon: Zap, label: "Planning Agent", color: "text-amber-500" },
-                  { icon: Globe, label: "Resource Agent", color: "text-green-500" },
-                  { icon: ShieldAlert, label: "Safety Agent", color: "text-red-500" }
-                ].map((agent, i) => (
-                  <Card key={i} className="p-4 rounded-2xl border bg-card/50 flex flex-col items-center gap-2 hover:shadow-lg transition-all group">
-                    <agent.icon className={cn("h-6 w-6 group-hover:scale-110 transition-transform", agent.color)} />
-                    <span className="text-[10px] font-black uppercase tracking-widest">{agent.label}</span>
-                  </Card>
-                ))}
-              </div>
             </section>
 
-            {/* Input Component */}
+            {/* Input Hub */}
             <DocumentProcessor 
               onAnalysisComplete={handleAnalysisComplete} 
               currentLanguage={accessibility.language}
             />
 
-            {/* Hub Insights */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="md:col-span-2">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-8 space-y-8">
                 <HistoryDashboard 
                   records={records} 
                   onSelect={setCurrentRecord} 
                   onDelete={handleDeleteRecord} 
                 />
               </div>
-              <div className="space-y-6">
+              <div className="lg:col-span-4 space-y-8">
+                <SelfCareHub />
+                
                 <Card className="p-6 border-primary/10 bg-primary/5 shadow-xl">
                   <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-6 flex items-center gap-2">
-                    <Target className="h-4 w-4" /> Planetary Metrics
+                    <Target className="h-4 w-4" /> Resilience Metrics
                   </h3>
                   <div className="space-y-6">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-muted-foreground">Opportunities Created</span>
-                      <span className="text-xl font-black text-primary">1.2M</span>
+                      <span className="text-xs font-bold text-muted-foreground">Human Potential Unlocked</span>
+                      <span className="text-xl font-black text-primary">{progress.resilienceScore}%</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-muted-foreground">Problems Solved</span>
-                      <span className="text-xl font-black text-primary">850K</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-muted-foreground">Well-being Uplift</span>
-                      <span className="text-xl font-black text-primary">+22%</span>
+                    <div className="h-2 w-full bg-primary/10 rounded-full overflow-hidden">
+                       <div className="h-full bg-primary" style={{ width: `${progress.resilienceScore}%` }} />
                     </div>
                   </div>
                 </Card>
-                
+
                 <Card className="p-6 border-secondary/10 bg-secondary/5">
                   <div className="flex items-center gap-3 mb-4">
                     <Brain className="h-5 w-5 text-secondary" />
                     <h3 className="text-sm font-black uppercase tracking-widest text-secondary">Neural Shield</h3>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Our safety protocols are deterministic. High-risk signals are processed with zero-latency human escalation paths. Aethia is watching over your resilience journey.
-                  </p>
-                </Card>
-
-                <Card className="p-6 border-destructive/10 bg-destructive/5">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Heart className="h-5 w-5 text-destructive" />
-                    <h3 className="text-sm font-black uppercase tracking-widest text-destructive">Humanity Core</h3>
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    The purpose of Aurora is to help humanity become more capable, informed, and resilient. We prioritize your flourishing over profit.
+                    Saathi Protocol is active. High-risk signals are prioritized with 99% accuracy for zero-latency escalation to human support networks.
                   </p>
                 </Card>
               </div>
@@ -262,12 +251,11 @@ export default function Home() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col items-start gap-1">
             <p className="font-black text-primary tracking-tight">PROJECT AURORA</p>
-            <p>© 2025 Aethia Systems. Empowering Global Resilience.</p>
+            <p>© 2025 Aethia Systems. Empowering Global Flourishing.</p>
           </div>
           <div className="flex items-center gap-8 font-bold text-[10px] uppercase tracking-widest">
             <a href="#" className="hover:text-primary transition-colors">Ethics Protocol</a>
             <a href="#" className="hover:text-primary transition-colors">Source Transparency</a>
-            <a href="#" className="hover:text-primary transition-colors">Universal Access</a>
             <a href="#" className="hover:text-primary transition-colors">Crisis Support</a>
           </div>
         </div>
