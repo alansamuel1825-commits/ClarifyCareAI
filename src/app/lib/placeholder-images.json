@@ -1,0 +1,17 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Professional support background",
+      "imageUrl": "https://picsum.photos/seed/clarifycare-hero/1200/600",
+      "imageHint": "professional support"
+    },
+    {
+      "id": "empty-history",
+      "description": "Illustration showing an empty list",
+      "imageUrl": "https://picsum.photos/seed/clarifycare-empty/400/300",
+      "imageHint": "empty document"
+    }
+  ]
+}
