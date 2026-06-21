@@ -37,7 +37,16 @@ export const translations: Record<Language, Record<string, string>> = {
     chatSend: "Ask AI",
     confScore: "CONFIDENCE",
     urgency: "Urgency",
-    resolutionProgress: "Resolution Progress"
+    resolutionProgress: "Resolution Progress",
+    moodTitle: "Mood Intelligence",
+    moodCheckIn: "How are you feeling right now?",
+    moodLog: "Log Mood",
+    moodTrend: "Resilience Forecast",
+    moodAwesome: "Awesome",
+    moodGood: "Good",
+    moodOkay: "Okay",
+    moodStressed: "Stressed",
+    moodLow: "Low"
   },
   Tamil: {
     heroTitle: "நிச்சயமற்ற தன்மையிலிருந்து அர்த்தமுள்ள செயலுக்குச் செல்லுங்கள்.",
@@ -74,7 +83,16 @@ export const translations: Record<Language, Record<string, string>> = {
     chatSend: "AI-யிடம் கேளுங்கள்",
     confScore: "நம்பிக்கை",
     urgency: "அவசரம்",
-    resolutionProgress: "தீர்வு முன்னேற்றம்"
+    resolutionProgress: "தீர்வு முன்னேற்றம்",
+    moodTitle: "மனநிலை நுண்ணறிவு",
+    moodCheckIn: "இப்போது நீங்கள் எப்படி உணர்கிறீர்கள்?",
+    moodLog: "மனநிலையைப் பதிவுசெய்க",
+    moodTrend: "மீள்தன்மை முன்னறிவிப்பு",
+    moodAwesome: "அற்புதம்",
+    moodGood: "நல்லது",
+    moodOkay: "பரவாயில்லை",
+    moodStressed: "மன அழுத்தத்தில்",
+    moodLow: "குறைவாக"
   },
   Hindi: {
     heroTitle: "अनिश्चितता से सार्थक कार्रवाई की ओर बढ़ें।",
@@ -111,7 +129,16 @@ export const translations: Record<Language, Record<string, string>> = {
     chatSend: "AI से पूछें",
     confScore: "विश्वास",
     urgency: "सख्ती",
-    resolutionProgress: "समाधान प्रगति"
+    resolutionProgress: "समाधान प्रगति",
+    moodTitle: "मूड इंटेलिजेंस",
+    moodCheckIn: "अभी आप कैसा महसूस कर रहे हैं?",
+    moodLog: "मूड लॉग करें",
+    moodTrend: "लचीलापन पूर्वानुमान",
+    moodAwesome: "बहुत बढ़िया",
+    moodGood: "अच्छा",
+    moodOkay: "ठीक",
+    moodStressed: "तनावग्रस्त",
+    moodLow: "कम"
   },
   Spanish: {
     heroTitle: "Pase de la incertidumbre a la acción significativa.",
@@ -148,7 +175,16 @@ export const translations: Record<Language, Record<string, string>> = {
     chatSend: "Preguntar a la IA",
     confScore: "CONFIANZA",
     urgency: "Urgencia",
-    resolutionProgress: "Progreso de la Resolución"
+    resolutionProgress: "Progreso de la Resolución",
+    moodTitle: "Inteligencia de Ánimo",
+    moodCheckIn: "¿Cómo te sientes ahora mismo?",
+    moodLog: "Registrar Ánimo",
+    moodTrend: "Pronóstico de Resiliencia",
+    moodAwesome: "Increíble",
+    moodGood: "Bien",
+    moodOkay: "Regular",
+    moodStressed: "Estresado",
+    moodLow: "Bajo"
   },
   French: {
     heroTitle: "Passez de l'incertitude à l'action concrète.",
@@ -185,6 +221,15 @@ export const translations: Record<Language, Record<string, string>> = {
     chatSend: "Demander à l'IA",
     confScore: "CONFIANCE",
     urgency: "Urgence",
-    resolutionProgress: "Progrès de la Résolution"
+    resolutionProgress: "Progrès de la Résolution",
+    moodTitle: "Intelligence de l'Humeur",
+    moodCheckIn: "Comment vous sentez-vous en ce moment ?",
+    moodLog: "Enregistrer l'Humeur",
+    moodTrend: "Prévisions de Résilience",
+    moodAwesome: "Génial",
+    moodGood: "Bien",
+    moodOkay: "Moyen",
+    moodStressed: "Stressé",
+    moodLow: "Bas"
   }
 };

@@ -41,9 +41,10 @@ interface AnalysisResultsProps {
   record: AnalysisRecord;
   onUpdateRecord: (record: AnalysisRecord) => void;
   accessibility: AccessibilitySettings;
+  historyContext?: string;
 }
 
-export function AnalysisResults({ record, onUpdateRecord, accessibility }: AnalysisResultsProps) {
+export function AnalysisResults({ record, onUpdateRecord, accessibility, historyContext }: AnalysisResultsProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showFollowUp, setShowFollowUp] = useState(false);
   const [chatQuery, setChatQuery] = useState('');
@@ -78,6 +79,7 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
     try {
       const response = await askInteractiveAssistant({
         analysisContext: JSON.stringify(record),
+        historyContext: historyContext,
         userQuery: query,
         targetLanguage: accessibility.language
       });

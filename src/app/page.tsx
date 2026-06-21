@@ -8,7 +8,8 @@ import { HistoryDashboard } from '@/components/HistoryDashboard';
 import { AccessibilityControl } from '@/components/AccessibilityControl';
 import { CrisisBanner } from '@/components/CrisisBanner';
 import { SelfCareHub } from '@/components/SelfCareHub';
-import { AnalysisRecord, AccessibilitySettings, UserProgress } from '@/lib/types';
+import { MoodAnalytics } from '@/components/MoodAnalytics';
+import { AnalysisRecord, AccessibilitySettings, UserProgress, MoodEntry } from '@/lib/types';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,19 +17,10 @@ import { Card } from "@/components/ui/card";
 import { translations } from '@/lib/translations';
 import { 
   ChevronLeft, 
-  ShieldAlert, 
-  Activity, 
-  Sparkles, 
   AlertTriangle,
   Brain,
-  Globe,
   Zap,
   Target,
-  Trophy,
-  Flame,
-  LayoutDashboard,
-  Users,
-  Dna,
   CheckCircle2,
   ShieldCheck
 } from "lucide-react";
@@ -42,7 +34,8 @@ export default function Home() {
     badges: ['Early Adopter', 'Resilience Starter'],
     moodScore: 72,
     resilienceScore: 65,
-    onboardingComplete: false
+    onboardingComplete: false,
+    moodHistory: []
   });
   const [accessibility, setAccessibility] = useState<AccessibilitySettings>({
     highContrast: false,
@@ -111,6 +104,15 @@ export default function Home() {
   const handleUpdateRecord = (updated: AnalysisRecord) => {
     setRecords(records.map(r => r.id === updated.id ? updated : r));
     setCurrentRecord(updated);
+  };
+
+  const handleLogMood = (score: number, label: string) => {
+    const newEntry: MoodEntry = { timestamp: Date.now(), score, label };
+    setProgress(prev => ({
+      ...prev,
+      moodHistory: [...prev.moodHistory, newEntry],
+      resilienceScore: Math.min(100, prev.resilienceScore + 1)
+    }));
   };
 
   const updateAccess = (key: string, value: any) => {
@@ -201,6 +203,7 @@ export default function Home() {
               record={currentRecord} 
               onUpdateRecord={handleUpdateRecord}
               accessibility={accessibility}
+              historyContext={records.length > 1 ? `Previous sessions found: ${records.length}. Last mood: ${progress.moodHistory[progress.moodHistory.length-1]?.label || 'Not logged'}` : undefined}
             />
           </div>
         ) : (
@@ -232,8 +235,17 @@ export default function Home() {
                 />
               </div>
               <div className="lg:col-span-4 space-y-8">
-                <SelfCareHub language={accessibility.language} />
+                <SelfCareHub 
+                  language={accessibility.language} 
+                  moodHistory={progress.moodHistory}
+                  onLogMood={handleLogMood}
+                />
                 
+                <MoodAnalytics 
+                  history={progress.moodHistory}
+                  language={accessibility.language}
+                />
+
                 <Card className="p-6 border-primary/10 bg-primary/5 shadow-xl">
                   <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-6 flex items-center gap-2">
                     <Target className="h-4 w-4" /> {t.resilienceHub}

@@ -11,6 +11,12 @@ export interface AgentInsight {
   recommendations: string[];
 }
 
+export interface MoodEntry {
+  timestamp: number;
+  score: number; // 0-100
+  label: string;
+}
+
 export interface AnalysisRecord {
   id: string;
   timestamp: number;
@@ -43,4 +49,5 @@ export interface UserProgress {
   moodScore: number;
   resilienceScore: number;
   onboardingComplete: boolean;
+  moodHistory: MoodEntry[];
 }
