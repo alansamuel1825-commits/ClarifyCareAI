@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 import { 
   AlertCircle, 
   Calendar, 
@@ -26,12 +27,15 @@ import {
   Globe,
   Share2,
   Printer,
-  CalendarCheck
+  CalendarCheck,
+  Send,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import { translations } from '@/lib/translations';
+import { askInteractiveAssistant } from '@/ai/flows/interactive-support-chat';
 
 interface AnalysisResultsProps {
   record: AnalysisRecord;
@@ -42,6 +46,9 @@ interface AnalysisResultsProps {
 export function AnalysisResults({ record, onUpdateRecord, accessibility }: AnalysisResultsProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showFollowUp, setShowFollowUp] = useState(false);
+  const [chatQuery, setChatQuery] = useState('');
+  const [isAsking, setIsAsking] = useState(false);
+  const [chatHistory, setChatHistory] = useState<{role: 'user' | 'ai', content: string}[]>([]);
   const { toast } = useToast();
   
   const t = translations[accessibility.language] || translations.English;
@@ -57,6 +64,29 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
       : [...record.completedSteps, step];
     
     onUpdateRecord({ ...record, completedSteps: updatedSteps });
+  };
+
+  const handleChatSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatQuery.trim() || isAsking) return;
+
+    const query = chatQuery;
+    setChatQuery('');
+    setChatHistory(prev => [...prev, { role: 'user', content: query }]);
+    setIsAsking(true);
+
+    try {
+      const response = await askInteractiveAssistant({
+        analysisContext: JSON.stringify(record),
+        userQuery: query,
+        targetLanguage: accessibility.language
+      });
+      setChatHistory(prev => [...prev, { role: 'ai', content: response.response }]);
+    } catch (err) {
+      toast({ variant: "destructive", title: "Assistant Error", description: "Could not reach interactive core." });
+    } finally {
+      setIsAsking(false);
+    }
   };
 
   const toggleSpeech = () => {
@@ -227,14 +257,40 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
                        <Bot className="h-5 w-5 text-primary" />
                        <p className="text-sm font-black text-primary uppercase">{t.checkInTitle}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground font-medium italic leading-relaxed">
+                    <p className="text-xs text-muted-foreground font-medium italic leading-relaxed mb-4">
                       "{t.checkInDesc}"
                     </p>
-                    <div className="flex flex-col gap-3 pt-2">
-                      <Button variant="secondary" className="h-12 font-black text-[10px] uppercase rounded-xl">I've Completed Phase 1</Button>
-                      <Button variant="outline" className="h-12 font-black text-[10px] uppercase rounded-xl">Refine My Next Steps</Button>
-                      <Button variant="ghost" size="sm" className="font-bold text-[9px] text-muted-foreground uppercase" onClick={() => setShowFollowUp(false)}>Minimize</Button>
+
+                    <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 mb-4 scrollbar-thin">
+                      {chatHistory.map((msg, i) => (
+                        <div key={i} className={cn(
+                          "p-3 rounded-2xl text-xs font-medium",
+                          msg.role === 'user' ? "bg-primary text-white ml-6" : "bg-muted text-foreground mr-6"
+                        )}>
+                          {msg.content}
+                        </div>
+                      ))}
+                      {isAsking && (
+                        <div className="flex items-center gap-2 text-[10px] font-black text-primary animate-pulse uppercase">
+                          <Loader2 className="h-3 w-3 animate-spin" /> {t.reasoning}
+                        </div>
+                      )}
                     </div>
+
+                    <form onSubmit={handleChatSubmit} className="flex gap-2">
+                      <Input 
+                        placeholder={t.chatPlaceholder}
+                        value={chatQuery}
+                        onChange={(e) => setChatQuery(e.target.value)}
+                        disabled={isAsking}
+                        className="rounded-xl text-xs h-10 border-primary/20"
+                      />
+                      <Button type="submit" size="icon" disabled={isAsking} className="h-10 w-10 shrink-0 rounded-xl">
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </form>
+                    
+                    <Button variant="ghost" size="sm" className="w-full font-bold text-[9px] text-muted-foreground uppercase mt-2" onClick={() => setShowFollowUp(false)}>Minimize</Button>
                   </div>
                 )}
               </div>
