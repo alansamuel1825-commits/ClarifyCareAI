@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A Genkit flow for translating analysis output into a specified language.
@@ -13,13 +14,13 @@ import {z} from 'genkit';
 const MultilingualAnalysisInputSchema = z.object({
   textToTranslate: z
     .string()
-    .describe('The combined text from the analysis to be translated.'),
+    .describe('The combined text from the analysis to be translated. This may be a JSON string.'),
   targetLanguage: z.string().describe('The language to translate the text into (e.g., "Spanish").'),
 });
 export type MultilingualAnalysisInput = z.infer<typeof MultilingualAnalysisInputSchema>;
 
 const MultilingualAnalysisOutputSchema = z.object({
-  translatedText: z.string().describe('The translated text in the target language.'),
+  translatedText: z.string().describe('The translated text in the target language. If the input was JSON, this MUST be a valid JSON string with the same keys.'),
 });
 export type MultilingualAnalysisOutput = z.infer<typeof MultilingualAnalysisOutputSchema>;
 
@@ -27,11 +28,14 @@ const translateAnalysisPrompt = ai.definePrompt({
   name: 'translateAnalysisPrompt',
   input: {schema: MultilingualAnalysisInputSchema},
   output: {schema: MultilingualAnalysisOutputSchema},
-  prompt: `Translate the following text into {{targetLanguage}} while preserving its structure and meaning. Ensure that all key information, explanations, action plans, and resource recommendations are accurately conveyed in the target language.
+  prompt: `You are an expert translator. Your goal is to translate the provided text or JSON object into {{targetLanguage}} while strictly preserving its structure and meaning.
 
-Text to translate:
+If the input is a JSON string, ensure you ONLY translate the values (strings), never the keys. The output MUST be a valid JSON string that can be parsed by JSON.parse().
 
-{{textToTranslate}}`,
+Text/JSON to translate:
+{{{textToTranslate}}}
+
+Output only the translated content.`,
 });
 
 const multilingualAnalysisOutputFlow = ai.defineFlow(

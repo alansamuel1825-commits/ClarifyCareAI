@@ -6,10 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heart, Wind, Moon, Sun, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Language } from '@/lib/types';
+import { translations } from '@/lib/translations';
 
-export function SelfCareHub() {
+export function SelfCareHub({ language }: { language: Language }) {
   const [isBreathing, setIsBreathing] = useState(false);
   const [phase, setPhase] = useState<'In' | 'Hold' | 'Out'>('In');
+  const t = translations[language] || translations.English;
 
   const startBreathing = () => {
     setIsBreathing(true);

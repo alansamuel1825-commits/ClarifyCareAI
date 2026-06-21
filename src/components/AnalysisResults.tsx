@@ -31,6 +31,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
+import { translations } from '@/lib/translations';
 
 interface AnalysisResultsProps {
   record: AnalysisRecord;
@@ -42,6 +43,8 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showFollowUp, setShowFollowUp] = useState(false);
   const { toast } = useToast();
+  
+  const t = translations[accessibility.language] || translations.English;
 
   const progressValue = record.actionPlan.actionPlan.length > 0 
     ? Math.round((record.completedSteps.length / record.actionPlan.actionPlan.length) * 100)
@@ -66,18 +69,11 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
       const langMap: Record<string, string> = {
         'English': 'en-US', 'Tamil': 'ta-IN', 'Hindi': 'hi-IN', 'Spanish': 'es-ES', 'French': 'fr-FR'
       };
-      utterance.lang = langMap[record.language] || 'en-US';
+      utterance.lang = langMap[accessibility.language] || 'en-US';
       utterance.onend = () => setIsSpeaking(false);
       window.speechSynthesis.speak(utterance);
       setIsSpeaking(true);
     }
-  };
-
-  const handleSyncToCalendar = () => {
-    toast({
-      title: "Syncing Actions...",
-      description: "Aurora is integrating these deadlines into your personal planetary calendar.",
-    });
   };
 
   return (
@@ -88,13 +84,13 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
             <Sparkles className="h-7 w-7" />
           </div>
           <div>
-            <h2 className="text-3xl font-headline font-black text-primary tracking-tight">Aurora Intelligence</h2>
+            <h2 className="text-3xl font-headline font-black text-primary tracking-tight">ClarifyCare AI</h2>
             <div className="flex items-center gap-3 mt-1">
               <Badge variant={record.actionPlan.urgency === 'High' ? 'destructive' : 'secondary'} className="font-black uppercase text-[10px]">
-                {record.actionPlan.urgency} Urgency
+                {record.actionPlan.urgency} {t.urgency}
               </Badge>
               <Badge variant="outline" className="border-secondary text-secondary font-black text-[10px]">
-                {record.confidenceScore}% CONFIDENCE
+                {record.confidenceScore}% {t.confScore}
               </Badge>
             </div>
           </div>
@@ -102,11 +98,11 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
         <div className="flex items-center gap-3">
           <Button variant={isSpeaking ? "destructive" : "secondary"} className="gap-2 font-black shadow-lg h-12 rounded-xl" onClick={toggleSpeech}>
             {isSpeaking ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-            {isSpeaking ? "STOP" : "LISTEN MODE"}
+            {isSpeaking ? t.stop : t.listenMode}
           </Button>
           <Button variant="outline" className="h-12 font-bold rounded-xl border-primary/20" onClick={() => window.print()}>
             <Printer className="h-4 w-4 mr-2" />
-            EXPORT HUB
+            {t.exportHub}
           </Button>
         </div>
       </div>
@@ -116,7 +112,7 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-primary/10"><Zap className="h-6 w-6 text-primary" /></div>
-              <h3 className="text-xl font-headline font-black text-primary">Resolution Progress</h3>
+              <h3 className="text-xl font-headline font-black text-primary">{t.resolutionProgress}</h3>
             </div>
             <span className="text-4xl font-black text-primary">{progressValue}%</span>
           </div>
@@ -129,30 +125,16 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
           <Card className="shadow-2xl border-none rounded-[2.5rem] overflow-hidden">
             <CardHeader className="border-b bg-card p-8">
               <CardTitle className="flex items-center gap-3 text-primary text-lg font-black uppercase tracking-widest">
-                <FileText className="h-5 w-5" /> PlainTalk™ Summary
+                <FileText className="h-5 w-5" /> {t.plainTalkSummary}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8 space-y-8">
               <p className="text-2xl leading-relaxed text-foreground/90 font-medium">{record.analysis.plainLanguageSummary}</p>
               
-              {record.agentInsights && record.agentInsights.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-8 border-t">
-                  {record.agentInsights.map((agent, i) => (
-                    <div key={i} className="p-4 rounded-2xl bg-muted/30 border border-border/50">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Bot className="h-4 w-4 text-primary" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-primary">{agent.agentName}</span>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground leading-tight italic">{agent.insight}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t">
                 <div className="space-y-4">
                   <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-                    <Sparkles className="h-4 w-4" /> Core Key Insights
+                    <Sparkles className="h-4 w-4" /> {t.coreInsights}
                   </h4>
                   <ul className="space-y-3">
                     {record.analysis.keyPoints.map((p, i) => (
@@ -165,7 +147,7 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
                 </div>
                 <div className="space-y-4 p-6 rounded-3xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200/50">
                   <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4" /> Consequences & Risk
+                    <AlertCircle className="h-4 w-4" /> {t.consequencesRisk}
                   </h4>
                   <p className="text-sm italic text-amber-900 dark:text-amber-200 font-medium leading-relaxed">{record.actionPlan.consequencesOfInaction}</p>
                 </div>
@@ -176,7 +158,7 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
           <Card className="shadow-2xl border-none overflow-hidden rounded-[2.5rem]">
             <CardHeader className="bg-secondary/10 border-b p-8">
               <CardTitle className="flex items-center gap-3 text-secondary text-lg font-black uppercase tracking-widest">
-                <LifeBuoy className="h-6 w-6" /> Support Assistant Network
+                <LifeBuoy className="h-6 w-6" /> {t.supportNetwork}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
@@ -201,13 +183,9 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
             <CardHeader className="bg-primary p-8 text-white">
               <CardTitle className="flex items-center justify-between text-lg font-black uppercase tracking-widest">
                 <div className="flex items-center gap-3">
-                  <ListChecks className="h-6 w-6" /> Action Protocol
+                  <ListChecks className="h-6 w-6" /> {t.actionProtocol}
                 </div>
-                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 rounded-full" onClick={handleSyncToCalendar}>
-                  <CalendarCheck className="h-5 w-5" />
-                </Button>
               </CardTitle>
-              <CardDescription className="text-primary-foreground/70 text-[9px] font-black uppercase mt-1">Planning Agent Orchestration</CardDescription>
             </CardHeader>
             <CardContent className="p-8 space-y-8 bg-card">
               <div className="space-y-3">
@@ -227,7 +205,7 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
               {record.actionPlan.deadlines.length > 0 && (
                 <div className="pt-8 border-t space-y-4">
                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-                    <Calendar className="h-4 w-4" /> Intelligence Timeline
+                    <Calendar className="h-4 w-4" /> {t.timeline}
                   </h4>
                   {record.actionPlan.deadlines.map((d, i) => (
                     <div key={i} className="p-5 rounded-2xl bg-destructive/5 border border-destructive/20 group hover:bg-destructive/10 transition-colors">
@@ -241,16 +219,16 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility }: Analy
               <div className="pt-8 border-t text-center space-y-4">
                 {!showFollowUp ? (
                   <Button variant="outline" className="w-full h-14 font-black rounded-2xl border-primary/20 text-primary shadow-sm hover:shadow-md transition-all" onClick={() => setShowFollowUp(true)}>
-                    OPEN FOLLOW-UP ASSISTANT
+                    {t.followUpBtn}
                   </Button>
                 ) : (
                   <div className="space-y-4 p-6 rounded-[2rem] bg-primary/5 border border-primary/20 animate-in zoom-in duration-500 text-left">
                     <div className="flex items-center gap-2 mb-2">
                        <Bot className="h-5 w-5 text-primary" />
-                       <p className="text-sm font-black text-primary uppercase">Saathi Check-In</p>
+                       <p className="text-sm font-black text-primary uppercase">{t.checkInTitle}</p>
                     </div>
                     <p className="text-xs text-muted-foreground font-medium italic leading-relaxed">
-                      "Are you effectively navigating the resolution path? I can refine these actions based on your current progress."
+                      "{t.checkInDesc}"
                     </p>
                     <div className="flex flex-col gap-3 pt-2">
                       <Button variant="secondary" className="h-12 font-black text-[10px] uppercase rounded-xl">I've Completed Phase 1</Button>

@@ -2,7 +2,7 @@
 "use client";
 
 import React from 'react';
-import { AnalysisRecord } from '@/lib/types';
+import { AnalysisRecord, Language } from '@/lib/types';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -15,14 +15,18 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { translations } from '@/lib/translations';
 
 interface HistoryDashboardProps {
   records: AnalysisRecord[];
   onSelect: (record: AnalysisRecord) => void;
   onDelete: (id: string) => void;
+  language: Language;
 }
 
-export function HistoryDashboard({ records, onSelect, onDelete }: HistoryDashboardProps) {
+export function HistoryDashboard({ records, onSelect, onDelete, language }: HistoryDashboardProps) {
+  const t = translations[language] || translations.English;
+  
   if (records.length === 0) {
     return (
       <Card className="border-dashed border-2 border-muted bg-transparent">
@@ -50,7 +54,7 @@ export function HistoryDashboard({ records, onSelect, onDelete }: HistoryDashboa
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-headline font-semibold text-primary flex items-center gap-2">
           <History className="h-5 w-5" />
-          Journey History
+          {t.historyTitle}
         </h2>
         <Badge variant="outline">{records.length} Documents</Badge>
       </div>
@@ -96,7 +100,7 @@ export function HistoryDashboard({ records, onSelect, onDelete }: HistoryDashboa
 
                   <div className="space-y-2">
                     <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      <span>Resolution Progress</span>
+                      <span>{t.resolutionProgress}</span>
                       <span>{progress}%</span>
                     </div>
                     <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">

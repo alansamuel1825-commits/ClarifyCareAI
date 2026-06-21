@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -32,6 +33,7 @@ import {
   multilingualAnalysisOutput 
 } from '@/ai/flows/multilingual-analysis-output';
 import { AnalysisRecord, Language, AgentInsight } from '@/lib/types';
+import { translations } from '@/lib/translations';
 
 interface DocumentProcessorProps {
   onAnalysisComplete: (record: AnalysisRecord) => void;
@@ -53,6 +55,8 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
   const recognitionRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  
+  const t = translations[currentLanguage] || translations.English;
 
   useEffect(() => {
     if (typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
@@ -60,7 +64,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = true;
       recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'en-US';
+      recognitionRef.current.lang = currentLanguage === 'Tamil' ? 'ta-IN' : currentLanguage === 'Hindi' ? 'hi-IN' : 'en-US';
 
       recognitionRef.current.onresult = (event: any) => {
         const transcript = Array.from(event.results)
@@ -71,7 +75,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
 
       recognitionRef.current.onend = () => setIsRecording(false);
     }
-  }, []);
+  }, [currentLanguage]);
 
   const toggleRecording = () => {
     if (isRecording) {
@@ -81,7 +85,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
       try {
         recognitionRef.current?.start();
         setIsRecording(true);
-        toast({ title: "Listening...", description: "Universal voice recognition active." });
+        toast({ title: t.listening, description: "Universal voice recognition active." });
       } catch (e) {
         toast({ variant: "destructive", title: "Speech recognition not supported" });
       }
@@ -119,7 +123,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
       const crisisTypesFound = CRISIS_KEYWORDS.filter(k => combinedText.toLowerCase().includes(k));
       const crisisDetected = crisisTypesFound.length > 0;
 
-      // Parallelized Multi-Agent Processing
+      // Core analysis (English source)
       const [analysisOutput, actionPlanOutput] = await Promise.all([
         documentAnalysisAndSimplification({ 
           documentText: text || undefined, 
@@ -138,22 +142,26 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
       let finalActionPlan = actionPlanOutput;
       let finalResources = resourcesOutput;
 
-      // Handle translation if needed
+      // Deep translation of AI outputs
       if (currentLanguage !== 'English') {
         const translateData = async (data: any) => {
           const res = await multilingualAnalysisOutput({
             textToTranslate: JSON.stringify(data),
             targetLanguage: currentLanguage
           });
-          return JSON.parse(res.translatedText);
+          // Attempt to parse LLM's JSON translation response
+          try {
+             return JSON.parse(res.translatedText);
+          } catch (err) {
+             console.error("LLM translation not valid JSON", res.translatedText);
+             return data; // Fallback
+          }
         };
-        try {
-           finalAnalysis = await translateData(analysisOutput);
-           finalActionPlan = await translateData(actionPlanOutput);
-           finalResources = await translateData(resourcesOutput);
-        } catch (e) {
-          console.warn("Translation failed, falling back to source", e);
-        }
+        
+        // Sequential translation to avoid context mixing
+        finalAnalysis = await translateData(analysisOutput);
+        finalActionPlan = await translateData(actionPlanOutput);
+        finalResources = await translateData(resourcesOutput);
       }
 
       const agentInsights: AgentInsight[] = [
@@ -171,11 +179,6 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
           agentName: "Planning Agent",
           insight: "Constructed a prioritized timeline based on extracted deadlines and urgency.",
           recommendations: ["Review upcoming deadlines in Progress Hub", "Synchronize actions with your calendar"]
-        },
-        {
-          agentName: "Research Agent",
-          insight: "Cross-referenced planetary knowledge base for similar resolution pathways.",
-          recommendations: ["Check eligibility for global support programs", "Access relevant educational modules"]
         }
       ];
 
@@ -200,8 +203,8 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
       setFileName(null);
       
       toast({
-        title: "Analysis Generated",
-        description: `Processing complete in ${currentLanguage}.`
+        title: t.analysisGenerated,
+        description: t.processingComplete
       });
     } catch (error) {
       console.error(error);
@@ -220,17 +223,17 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-headline font-black text-primary flex items-center gap-3">
                 <BrainCircuit className="h-6 w-6 text-secondary" />
-                Intelligence Input Hub
+                {t.inputHubTitle}
               </h2>
               <Badge variant="outline" className="flex items-center gap-2 border-primary/20 bg-primary/5 px-4 py-1">
                 <Languages className="h-3 w-3" />
-                {currentLanguage} Analysis
+                {currentLanguage}
               </Badge>
             </div>
             
             <div className="relative group">
               <Textarea 
-                placeholder="Paste content, upload a file, or use Voice Mode. I am here to help you understand and act..."
+                placeholder={t.placeholderText}
                 className={cn(
                   "min-h-[220px] text-lg font-body resize-none focus-visible:ring-secondary border-muted p-8 leading-relaxed shadow-inner rounded-3xl",
                   isRecording && "ring-4 ring-destructive/30 animate-pulse"
@@ -242,7 +245,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
               {isRecording && (
                 <div className="absolute top-6 right-6 flex items-center gap-3 text-destructive font-black text-xs tracking-widest">
                   <span className="h-3 w-3 rounded-full bg-destructive animate-ping" />
-                  VOICE MODE ACTIVE
+                  {t.voiceActive}
                 </div>
               )}
 
@@ -261,7 +264,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
               <input type="file" ref={fileInputRef} className="hidden" accept="application/pdf,image/*" onChange={handleFileUpload} />
               <Button variant="outline" className="h-12 gap-2 font-bold border-primary/20 hover:bg-primary/5 rounded-xl" onClick={() => fileInputRef.current?.click()}>
                 <Upload className="h-4 w-4" />
-                Integrate File
+                {t.integrateFile}
               </Button>
               <Button 
                 variant={isRecording ? "destructive" : "outline"} 
@@ -270,7 +273,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
                 disabled={isAnalyzing}
               >
                 {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                Voice Mode
+                {t.voiceMode}
               </Button>
               <div className="flex-1" />
               <Button 
@@ -279,7 +282,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
                 disabled={isAnalyzing}
               >
                 {isAnalyzing ? <Loader2 className="h-5 w-5 animate-spin" /> : <BrainCircuit className="h-5 w-5" />}
-                {isAnalyzing ? "REASONING..." : "ANALYZE"}
+                {isAnalyzing ? t.reasoning : t.analyzeBtn}
               </Button>
             </div>
           </div>
