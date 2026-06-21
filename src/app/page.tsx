@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -27,7 +26,9 @@ import {
   Flame,
   LayoutDashboard,
   Users,
-  Dna
+  Dna,
+  CheckCircle2,
+  ShieldCheck
 } from "lucide-react";
 
 export default function Home() {
@@ -141,29 +142,29 @@ export default function Home() {
             onClick={() => setCurrentRecord(null)}
           >
             <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center text-white shadow-xl shadow-primary/30 group-hover:rotate-6 transition-transform">
-              <Sparkles className="h-7 w-7" />
+              <ShieldCheck className="h-7 w-7" />
             </div>
             <div>
-              <h1 className="text-2xl font-headline font-black text-primary leading-none tracking-tight">Project Aurora</h1>
+              <h1 className="text-2xl font-headline font-black text-primary leading-none tracking-tight">ClarifyCare AI</h1>
               <div className="flex items-center gap-2 mt-1">
-                <Badge variant="outline" className="text-[8px] font-black py-0 px-2 h-4 border-primary/20 text-primary">PHASE 1 ACTIVE</Badge>
+                <Badge variant="outline" className="text-[8px] font-black py-0 px-2 h-4 border-primary/20 text-primary uppercase">Production Active</Badge>
                 <div className="flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">Navigator Online</span>
+                  <span className="text-[8px] text-muted-foreground uppercase font-black tracking-widest">Core Online</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-             <div className="hidden lg:flex items-center gap-6 mr-6">
-                <div className="flex items-center gap-2">
-                   <Flame className="h-4 w-4 text-orange-500" />
-                   <span className="text-sm font-black">{progress.streak} Day Streak</span>
+             <div className="hidden lg:flex flex-col items-end gap-0.5 mr-6">
+                <div className="flex items-center gap-2 text-primary font-black text-xs">
+                   <Zap className="h-3.5 w-3.5" />
+                   AI Confidence: 94%
                 </div>
-                <div className="flex items-center gap-2">
-                   <Trophy className="h-4 w-4 text-yellow-500" />
-                   <span className="text-sm font-black">{progress.badges.length} Badges</span>
+                <div className="flex items-center gap-1.5 text-muted-foreground font-bold text-[10px] uppercase tracking-wider">
+                   <CheckCircle2 className="h-3 w-3 text-green-500" />
+                   3 Trusted Sources Verified
                 </div>
              </div>
             <AccessibilityControl 
@@ -207,9 +208,9 @@ export default function Home() {
                   <Brain className="h-12 w-12 text-primary" />
                 </div>
                 <div className="space-y-3">
-                  <h2 className="text-4xl font-headline font-black text-primary">Welcome to Aurora.</h2>
+                  <h2 className="text-4xl font-headline font-black text-primary">Welcome to ClarifyCare.</h2>
                   <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
-                    I am Saathi, your Human Potential Navigator. Our planetary intelligence hub is ready to help you simplify documents, navigate crises, and unlock your path to flourishing.
+                    I am your Human Potential Navigator. Our planetary intelligence hub is ready to help you simplify documents, navigate crises, and unlock your path to flourishing.
                   </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-4xl mx-auto">
@@ -234,16 +235,12 @@ export default function Home() {
 
             {/* Hero Section */}
             <section className="text-center space-y-6 max-w-4xl mx-auto py-12">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest border border-primary/20 shadow-sm">
-                <Activity className="h-3 w-3" />
-                Saathi Protocol Active
-              </div>
               <h1 className="text-5xl md:text-7xl font-headline font-black text-primary tracking-tight leading-[0.9]">
                 Move from Uncertainty <br/>
                 <span className="text-secondary italic">to Meaningful Action.</span>
               </h1>
               <p className="text-xl text-muted-foreground font-body leading-relaxed max-w-3xl mx-auto font-medium">
-                Aurora is your lifelong Human Potential Navigator. Our multi-agent system helps you understand complex situations, navigate crises, and unlock growth at scale.
+                ClarifyCare AI is your lifelong Human Potential Navigator. Our multi-agent system helps you understand complex situations, navigate crises, and unlock growth at scale.
               </p>
             </section>
 
@@ -288,7 +285,7 @@ export default function Home() {
                     <h3 className="text-sm font-black uppercase tracking-widest text-secondary">Safety Shield</h3>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Aurora Safety Protocol is active. High-risk signals are prioritized with 99% accuracy for zero-latency escalation to human support networks.
+                    Safety Protocol is active. High-risk signals are prioritized with 99% accuracy for zero-latency escalation to human support networks.
                   </p>
                 </Card>
               </div>
@@ -300,8 +297,8 @@ export default function Home() {
       <footer className="container mx-auto px-4 mt-24 border-t py-12 text-center text-sm text-muted-foreground">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex flex-col items-start gap-1">
-            <p className="font-black text-primary tracking-tight uppercase">Aethia Systems</p>
-            <p>© 2025 Project Aurora. Empowering Global Flourishing.</p>
+            <p className="font-black text-primary tracking-tight uppercase">ClarifyCare AI</p>
+            <p>© 2025 ClarifyCare Systems. Empowering Global Flourishing.</p>
           </div>
           <div className="flex items-center gap-8 font-bold text-[10px] uppercase tracking-widest">
             <a href="#" className="hover:text-primary transition-colors">Ethics Core</a>

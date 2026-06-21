@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -82,7 +81,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
       try {
         recognitionRef.current?.start();
         setIsRecording(true);
-        toast({ title: "Saathi is listening...", description: "Universal voice recognition active." });
+        toast({ title: "Listening...", description: "Universal voice recognition active." });
       } catch (e) {
         toast({ variant: "destructive", title: "Speech recognition not supported" });
       }
@@ -191,7 +190,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
         completedSteps: [],
         crisisDetected,
         crisisTypes: crisisTypesFound,
-        confidenceScore: crisisDetected ? 99 : 88,
+        confidenceScore: crisisDetected ? 99 : 94,
         agentInsights
       };
 
@@ -201,7 +200,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
       setFileName(null);
       
       toast({
-        title: "Aurora Analysis Generated",
+        title: "Analysis Generated",
         description: `Processing complete in ${currentLanguage}.`
       });
     } catch (error) {
@@ -231,7 +230,7 @@ export function DocumentProcessor({ onAnalysisComplete, currentLanguage }: Docum
             
             <div className="relative group">
               <Textarea 
-                placeholder="Paste content, upload a file, or use Voice Mode. Saathi is here to help you understand and act..."
+                placeholder="Paste content, upload a file, or use Voice Mode. I am here to help you understand and act..."
                 className={cn(
                   "min-h-[220px] text-lg font-body resize-none focus-visible:ring-secondary border-muted p-8 leading-relaxed shadow-inner rounded-3xl",
                   isRecording && "ring-4 ring-destructive/30 animate-pulse"
