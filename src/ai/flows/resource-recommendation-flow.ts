@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview A Genkit flow for recommending tailored support resources based on document context.
+ * @fileOverview A Genkit flow for recommending the world's best support resources based on context.
  *
  * - recommendResources - A function that handles the resource recommendation process.
  * - ResourceRecommendationInput - The input type for the recommendResources function.
@@ -27,14 +27,14 @@ export type ResourceRecommendationInput = z.infer<typeof ResourceRecommendationI
 
 const ResourceSchema = z.object({
   name: z.string().describe('The name of the recommended resource.'),
-  type: z.string().describe('The type of resource (e.g., "Non-profit organization", "Government agency", "Helpline", "School Contact").'),
+  type: z.string().describe('The type of resource (e.g., "Non-profit organization", "Government agency", "Helpline").'),
   description: z.string().describe('A brief description of what the resource offers.'),
-  contactInfo: z.string().describe('Contact information for the resource (e.g., phone number, website, address).'),
-  relevanceExplanation: z.string().describe('A brief explanation of why this resource is relevant to the user\'s situation.'),
+  contactInfo: z.string().describe('Detailed contact information (phone, website, or address).'),
+  relevanceExplanation: z.string().describe('A deep explanation of why this specific resource is the best choice for this user.'),
 });
 
 const ResourceRecommendationOutputSchema = z.object({
-  resources: z.array(ResourceSchema).describe('A list of tailored support resources.'),
+  resources: z.array(ResourceSchema).describe('A list of tailored, best-in-class support resources.'),
 });
 export type ResourceRecommendationOutput = z.infer<typeof ResourceRecommendationOutputSchema>;
 
@@ -46,19 +46,25 @@ const prompt = ai.definePrompt({
   name: 'resourceRecommendationPrompt',
   input: { schema: ResourceRecommendationInputSchema },
   output: { schema: ResourceRecommendationOutputSchema },
-  prompt: `You are an AI assistant specialized in recommending support resources. Based on the provided document classification, key points, urgency, and optional location, identify and recommend relevant support resources.
+  prompt: `You are the ClarifyCare Resource Agent. Your goal is to identify the most effective, trusted, and "best-in-the-world" resources to help the user resolve their specific problem.
 
-Focus on providing actionable resources such as organizations, services, counselors, helplines, or community programs. For each resource, include its name, type, a brief description, contact information (like phone, website, or address), and a concise explanation of its relevance.
+Organize your recommendations by relevance. Prioritize official government agencies, established non-profits, and verified helplines.
 
-If a location is provided, prioritize local resources. If no specific local resources can be found for a given location, provide general, widely available resources.
+Include:
+- Resource Name
+- Type
+- Description of services
+- Detailed Contact Info
+- Relevance Score: Explain exactly how this resource addresses the key points and urgency identified.
 
-Document Classification: {{{documentClassification}}}
+If a location is provided ({{{location}}}), use your knowledge of local services in that area. Otherwise, provide the best national or global resources.
+
+Context:
+Classification: {{{documentClassification}}}
 Key Points: {{{keyPoints}}}
 Urgency: {{{urgency}}}
-{{#if location}}Location: {{{location}}}{{/if}}
 
-Provide at least 3-5 relevant resources.
-`,
+Provide 3-5 high-quality resources.`,
 });
 
 const resourceRecommendationFlow = ai.defineFlow(

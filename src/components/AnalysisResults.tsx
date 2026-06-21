@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -29,7 +28,9 @@ import {
   Printer,
   CalendarCheck,
   Send,
-  Loader2
+  Loader2,
+  ArrowRightCircle,
+  Clock3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -96,7 +97,7 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility, history
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
     } else {
-      const textToRead = `${record.analysis.plainLanguageSummary}. Required actions: ${record.actionPlan.actionPlan.join(". ")}`;
+      const textToRead = `${record.analysis.plainLanguageSummary}. ${t.actionProtocol}: ${record.actionPlan.actionPlan.join(". ")}`;
       const utterance = new SpeechSynthesisUtterance(textToRead);
       const langMap: Record<string, string> = {
         'English': 'en-US', 'Tamil': 'ta-IN', 'Hindi': 'hi-IN', 'Spanish': 'es-ES', 'French': 'fr-FR'
@@ -139,12 +140,16 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility, history
         </div>
       </div>
 
+      {/* Progress & Milestone Hub */}
       <Card className="border-primary/20 bg-primary/5 shadow-inner rounded-3xl overflow-hidden">
         <CardContent className="p-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-primary/10"><Zap className="h-6 w-6 text-primary" /></div>
-              <h3 className="text-xl font-headline font-black text-primary">{t.resolutionProgress}</h3>
+              <div>
+                <h3 className="text-xl font-headline font-black text-primary">{t.resolutionProgress}</h3>
+                <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Planetary Milestone Tracker</p>
+              </div>
             </div>
             <span className="text-4xl font-black text-primary">{progressValue}%</span>
           </div>
@@ -154,6 +159,7 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility, history
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
+          {/* Summary Section */}
           <Card className="shadow-2xl border-none rounded-[2.5rem] overflow-hidden">
             <CardHeader className="border-b bg-card p-8">
               <CardTitle className="flex items-center gap-3 text-primary text-lg font-black uppercase tracking-widest">
@@ -171,7 +177,7 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility, history
                   <ul className="space-y-3">
                     {record.analysis.keyPoints.map((p, i) => (
                       <li key={i} className="flex gap-3 text-sm">
-                        <div className="h-1.5 w-1.5 rounded-full bg-secondary shrink-0 mt-1.5" />
+                        <ArrowRightCircle className="h-4 w-4 text-secondary shrink-0 mt-0.5" />
                         <span className="text-muted-foreground font-medium">{p}</span>
                       </li>
                     ))}
@@ -187,6 +193,38 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility, history
             </CardContent>
           </Card>
 
+          {/* Timeline Section */}
+          <Card className="shadow-2xl border-none overflow-hidden rounded-[2.5rem]">
+            <CardHeader className="bg-primary/5 border-b p-8">
+              <CardTitle className="flex items-center gap-3 text-primary text-lg font-black uppercase tracking-widest">
+                <Clock3 className="h-6 w-6" /> {t.timeline}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-8">
+              {record.actionPlan.deadlines.length > 0 ? (
+                <div className="space-y-4">
+                  {record.actionPlan.deadlines.map((d, i) => (
+                    <div key={i} className="flex items-center gap-6 p-6 rounded-3xl border border-border bg-card group hover:border-primary transition-all">
+                      <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-primary/10 border border-primary/20 shrink-0 min-w-[80px]">
+                        <span className="text-[10px] font-black uppercase text-primary mb-1">Date</span>
+                        <span className="text-sm font-black text-primary">{d.date}</span>
+                      </div>
+                      <div className="space-y-1">
+                        <Badge variant="outline" className="text-[8px] font-black uppercase border-destructive text-destructive">{d.importance}</Badge>
+                        <h5 className="font-bold text-foreground text-sm leading-tight">{d.task}</h5>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-12 text-center text-muted-foreground italic font-medium">
+                  No explicit deadlines detected. We recommend starting resolution protocols immediately.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Resources Section */}
           <Card className="shadow-2xl border-none overflow-hidden rounded-[2.5rem]">
             <CardHeader className="bg-secondary/10 border-b p-8">
               <CardTitle className="flex items-center gap-3 text-secondary text-lg font-black uppercase tracking-widest">
@@ -197,12 +235,19 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility, history
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {record.resources.resources.map((res, i) => (
                   <div key={i} className="p-6 rounded-3xl border border-border bg-card hover:border-secondary hover:shadow-lg transition-all flex flex-col group">
-                    <Badge variant="outline" className="text-[8px] tracking-widest font-black uppercase w-fit mb-3">{res.type}</Badge>
+                    <div className="flex items-center justify-between mb-3">
+                      <Badge variant="outline" className="text-[8px] tracking-widest font-black uppercase border-secondary text-secondary">{res.type}</Badge>
+                    </div>
                     <h5 className="font-black text-xl text-primary mb-2 group-hover:text-secondary transition-colors">{res.name}</h5>
                     <p className="text-xs text-muted-foreground mb-4 leading-relaxed">{res.description}</p>
-                    <Button variant="link" className="p-0 h-auto text-xs font-black text-secondary mt-auto justify-start" onClick={() => window.open(`tel:${res.contactInfo}`, '_self')}>
-                      <Phone className="h-4 w-4 mr-2" /> {res.contactInfo}
-                    </Button>
+                    <div className="mt-auto space-y-4">
+                      <div className="p-3 rounded-xl bg-muted/30 text-[10px] font-medium text-muted-foreground italic border-l-2 border-secondary">
+                        "{res.relevanceExplanation}"
+                      </div>
+                      <Button variant="outline" className="w-full font-black text-secondary border-secondary/20 hover:bg-secondary/5 h-10 rounded-xl" onClick={() => window.open(res.contactInfo.includes('http') ? res.contactInfo : `tel:${res.contactInfo}`, '_blank')}>
+                        <Phone className="h-4 w-4 mr-2" /> Connect
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -211,6 +256,7 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility, history
         </div>
 
         <div className="space-y-8">
+          {/* Action Protocol Section */}
           <Card className="shadow-2xl border-none sticky top-24 overflow-hidden rounded-[2.5rem]">
             <CardHeader className="bg-primary p-8 text-white">
               <CardTitle className="flex items-center justify-between text-lg font-black uppercase tracking-widest">
@@ -233,20 +279,6 @@ export function AnalysisResults({ record, onUpdateRecord, accessibility, history
                   </div>
                 ))}
               </div>
-
-              {record.actionPlan.deadlines.length > 0 && (
-                <div className="pt-8 border-t space-y-4">
-                   <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-                    <Calendar className="h-4 w-4" /> {t.timeline}
-                  </h4>
-                  {record.actionPlan.deadlines.map((d, i) => (
-                    <div key={i} className="p-5 rounded-2xl bg-destructive/5 border border-destructive/20 group hover:bg-destructive/10 transition-colors">
-                      <div className="font-black text-destructive text-xs mb-1 uppercase tracking-wider">{d.date}</div>
-                      <div className="text-xs font-bold text-foreground leading-relaxed">{d.task}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
 
               <div className="pt-8 border-t text-center space-y-4">
                 {!showFollowUp ? (
